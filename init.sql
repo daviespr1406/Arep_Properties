@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS properties (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    address VARCHAR(255) NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    owner VARCHAR(255) NOT NULL
+    );

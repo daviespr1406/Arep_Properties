@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Property Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        input, button { margin: 0.5rem; }
+        .property-card {
+            border: 1px solid #ccc; padding: 1rem; margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<h1>🏠 Property Manager</h1>
+
+<h2>Create Property</h2>
+<form id="propertyForm">
+    <input type="text" id="address" placeholder="Address" required>
+    <input type="number" id="price" placeholder="Price" required>
+    <input type="text" id="size" placeholder="Size" required>
+    <input type="text" id="description" placeholder="Description" required>
+    <button type="submit" id="saveBtn">Save</button>
+</form>
+
+<h2>All Properties</h2>
+<div id="propertiesList"></div>
+
+<script>
+    document.getElementById("saveBtn").addEventListener("click", async function (event) {
+        event.preventDefault(); // evita que el form recargue la página
+
+        const address = document.getElementById("address").value;
+        const price = document.getElementById("price").value;
+        const size = document.getElementById("size").value;
+        const description = document.getElementById("description").value;
+
+        const property = { address, price, size, description };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/properties", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(property)
+            });
+
+            if (response.ok) {
+                alert("Property saved!");
+                loadProperties();
+                document.getElementById("propertyForm").reset();
+            } else {
+                alert("Error saving property: " + response.status);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+
+    async function loadProperties() {
+        try {
+            const response = await fetch("http://localhost:8080/api/properties");
+            const properties = await response.json();
+
+            const listContainer = document.getElementById("propertiesList");
+            listContainer.innerHTML = "";
+
+            properties.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "property-card";
+                div.textContent = `${p.address} - $${p.price} - ${p.size}m² - ${p.description}`;
+                listContainer.appendChild(div);
+            });
+        } catch (error) {
+            console.error("Error loading properties:", error);
+        }
+    }
+
+    loadProperties();
+</script>
+</body>
+</html>
